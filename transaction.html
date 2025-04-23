@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Transaction Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .transaction-item {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+
+    input, select, textarea {
+      display: block;
+      margin-bottom: 10px;
+      padding: 8px;
+      width: 300px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 8px 12px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Transaction Management System</h1>
+
+  <button onclick="toggleSection('form')">Add Transaction</button>
+  <button onclick="toggleSection('history')">View Transactions</button>
+
+  <!-- Transaction Form -->
+  <div id="transactionForm" class="hidden">
+    <h2>New Transaction</h2>
+    <form onsubmit="event.preventDefault(); submitTransaction();">
+      <label for="transactionId">Transaction ID</label>
+      <input type="text" id="transactionId" required>
+
+      <label for="ssn">SSN</label>
+      <input type="text" id="ssn" required>
+
+      <label for="name">Name</label>
+      <input type="text" id="name" required>
+
+      <label for="accountNo">Account Number</label>
+      <input type="text" id="accountNo" required>
+
+      <label for="aadhaar">Aadhaar</label>
+      <input type="text" id="aadhaar" required>
+
+      <label for="pan">PAN</label>
+      <input type="text" id="pan" required>
+
+      <label for="address">Address</label>
+      <textarea id="address" rows="2" required></textarea>
+
+      <label for="date">Transaction Date</label>
+      <input type="date" id="date" required>
+
+      <label for="contact">Contact Number</label>
+      <input type="text" id="contact" required>
+
+      <label for="mode">Mode of Payment</label>
+      <select id="mode" required>
+        <option value="">Select</option>
+        <option>Cash</option>
+        <option>Cheque</option>
+        <option>Online</option>
+      </select>
+
+      <label for="amount">Amount (₹)</label>
+      <input type="number" id="amount" required>
+
+      <label for="type">Transaction Type</label>
+      <select id="type" required>
+        <option value="">Select</option>
+        <option>Credit</option>
+        <option>Debit</option>
+      </select>
+
+      <button type="submit">Submit Transaction</button>
+    </form>
+  </div>
+
+  <!-- Transaction History -->
+  <div id="transactionHistory" class="hidden">
+    <h2>Transaction History</h2>
+    <div id="historyList"></div>
+  </div>
+
+  <script>
+    let transactions = [];
+
+    function toggleSection(section) {
+      document.getElementById("transactionForm").style.display = "none";
+      document.getElementById("transactionHistory").style.display = "none";
+
+      if (section === 'form') {
+        clearTransactionForm();
+        document.getElementById("transactionForm").style.display = "block";
+      } else if (section === 'history') {
+        showTransactionHistory();
+        document.getElementById("transactionHistory").style.display = "block";
+      }
+    }
+
+    function submitTransaction() {
+      const txn = {
+        id: document.getElementById("transactionId").value,
+        ssn: document.getElementById("ssn").value,
+        name: document.getElementById("name").value,
+        accountNo: document.getElementById("accountNo").value,
+        aadhaar: document.getElementById("aadhaar").value,
+        pan: document.getElementById("pan").value,
+        address: document.getElementById("address").value,
+        date: document.getElementById("date").value,
+        contact: document.getElementById("contact").value,
+        mode: document.getElementById("mode").value,
+        amount: document.getElementById("amount").value,
+        type: document.getElementById("type").value
+      };
+
+      transactions.push(txn);
+      clearTransactionForm();
+      toggleSection('history');
+    }
+
+    function showTransactionHistory() {
+      const container = document.getElementById("historyList");
+      container.innerHTML = "";
+
+      transactions.forEach(txn => {
+        const div = document.createElement("div");
+        div.className = "transaction-item";
+        div.innerHTML = `
+          <strong>${txn.name}</strong> (${txn.type})<br>
+          ID: ${txn.id} | SSN: ${txn.ssn} | A/C: ${txn.accountNo}<br>
+          Aadhaar: ${txn.aadhaar} | PAN: ${txn.pan}<br>
+          Address: ${txn.address} | Contact: ${txn.contact}<br>
+          Date: ${txn.date} | Mode: ${txn.mode} | Amount: ₹${txn.amount}
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function clearTransactionForm() {
+      const ids = [
+        "transactionId", "ssn", "name", "accountNo", "aadhaar", "pan",
+        "address", "date", "contact", "mode", "amount", "type"
+      ];
+      ids.forEach(id => document.getElementById(id).value = "");
+    }
+  </script>
+</body>
+</html>

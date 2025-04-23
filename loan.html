@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loan Management System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .loan-item {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+
+    .action-buttons button {
+      margin-right: 10px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    input, select, textarea {
+      display: block;
+      margin-bottom: 10px;
+      padding: 8px;
+      width: 300px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 8px 12px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Loan Management System</h1>
+
+  <button onclick="showLoanSection('form')">Apply for Loan</button>
+  <button onclick="showLoanSection('list')">View Loan Applications</button>
+
+  <!-- Loan Form -->
+  <div id="loanForm" class="hidden">
+    <h2>Loan Application Form</h2>
+    <form onsubmit="event.preventDefault(); submitLoan();">
+      <label for="ssn">SSN</label>
+      <input type="text" id="ssn" required>
+
+      <label for="name">Name</label>
+      <input type="text" id="name" required>
+
+      <label for="occupation">Occupation</label>
+      <input type="text" id="occupation" required>
+
+      <label for="employerName">Employer Name</label>
+      <input type="text" id="employerName" required>
+
+      <label for="employerAddress">Employer Address</label>
+      <textarea id="employerAddress" rows="2" required></textarea>
+
+      <label for="customerEmail">Email</label>
+      <input type="email" id="customerEmail" required>
+
+      <label for="marital">Marital Status</label>
+      <select id="marital" required>
+        <option value="">Select</option>
+        <option>Single</option>
+        <option>Married</option>
+      </select>
+
+      <label for="contact">Contact Number</label>
+      <input type="text" id="contact" required>
+
+      <label for="loanAmount">Loan Amount (₹)</label>
+      <input type="number" id="loanAmount" required>
+
+      <label for="loanLength">Loan Duration (Months)</label>
+      <input type="number" id="loanLength" required>
+
+      <button type="submit">Submit Loan Request</button>
+    </form>
+  </div>
+
+  <!-- Loan List Section -->
+  <div id="loanListSection" class="hidden">
+    <h2>Loan Applications</h2>
+    <div id="loanList"></div>
+  </div>
+
+  <!-- Script -->
+  <script>
+    let loans = [];
+    let editingLoanIndex = -1;
+
+    function showLoanSection(section) {
+      document.getElementById("loanForm").style.display = "none";
+      document.getElementById("loanListSection").style.display = "none";
+
+      if (section === 'form') {
+        clearLoanForm();
+        document.getElementById("loanForm").style.display = "block";
+      } else if (section === 'list') {
+        renderLoanList();
+        document.getElementById("loanListSection").style.display = "block";
+      }
+    }
+
+    function submitLoan() {
+      const loan = {
+        ssn: document.getElementById("ssn").value,
+        name: document.getElementById("name").value,
+        occupation: document.getElementById("occupation").value,
+        employerName: document.getElementById("employerName").value,
+        employerAddress: document.getElementById("employerAddress").value,
+        customerEmail: document.getElementById("customerEmail").value,
+        marital: document.getElementById("marital").value,
+        contact: document.getElementById("contact").value,
+        loanAmount: document.getElementById("loanAmount").value,
+        loanLength: document.getElementById("loanLength").value
+      };
+
+      if (editingLoanIndex >= 0) {
+        loans[editingLoanIndex] = loan;
+        editingLoanIndex = -1;
+      } else {
+        loans.push(loan);
+      }
+
+      clearLoanForm();
+      showLoanSection('list');
+    }
+
+    function renderLoanList() {
+      const list = document.getElementById("loanList");
+      list.innerHTML = "";
+
+      loans.forEach((loan, index) => {
+        const div = document.createElement("div");
+        div.className = "loan-item";
+        div.innerHTML = `
+          <strong>${loan.name}</strong><br>
+          SSN: ${loan.ssn} | Occupation: ${loan.occupation}<br>
+          Employer: ${loan.employerName}, ${loan.employerAddress}<br>
+          Email: ${loan.customerEmail} | Contact: ${loan.contact}<br>
+          Marital Status: ${loan.marital} | Amount: ₹${loan.loanAmount} | Duration: ${loan.loanLength} months
+          <div class="action-buttons">
+            <button onclick="editLoan(${index})">Edit</button>
+            <button onclick="removeLoan(${index})">Cancel</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function editLoan(index) {
+      const loan = loans[index];
+      editingLoanIndex = index;
+      showLoanSection('form');
+
+      document.getElementById("ssn").value = loan.ssn;
+      document.getElementById("name").value = loan.name;
+      document.getElementById("occupation").value = loan.occupation;
+      document.getElementById("employerName").value = loan.employerName;
+      document.getElementById("employerAddress").value = loan.employerAddress;
+      document.getElementById("customerEmail").value = loan.customerEmail;
+      document.getElementById("marital").value = loan.marital;
+      document.getElementById("contact").value = loan.contact;
+      document.getElementById("loanAmount").value = loan.loanAmount;
+      document.getElementById("loanLength").value = loan.loanLength;
+    }
+
+    function removeLoan(index) {
+      if (confirm("Are you sure you want to cancel this loan request?")) {
+        loans.splice(index, 1);
+        renderLoanList();
+      }
+    }
+
+    function clearLoanForm() {
+      const ids = [
+        "ssn", "name", "occupation", "employerName",
+        "employerAddress", "customerEmail", "marital",
+        "contact", "loanAmount", "loanLength"
+      ];
+      ids.forEach(id => document.getElementById(id).value = "");
+    }
+  </script>
+</body>
+</html>

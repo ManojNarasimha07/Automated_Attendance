@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .customer-item {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    .action-buttons button {
+      margin-right: 10px;
+    }
+
+    input, select, textarea {
+      display: block;
+      margin-bottom: 10px;
+      padding: 5px;
+      width: 300px;
+    }
+
+    label {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Customer Management</h1>
+
+  <button onclick="showSection('form')">Add New Customer</button>
+  <button onclick="showSection('list')">View Customer List</button>
+
+  <div id="registrationForm" class="hidden">
+    <h2>Customer Registration</h2>
+    <form onsubmit="event.preventDefault(); submitCustomer();">
+      <label>SSN</label>
+      <input type="text" id="ssn" required>
+
+      <label>First Name</label>
+      <input type="text" id="firstName" required>
+
+      <label>Last Name</label>
+      <input type="text" id="lastName" required>
+
+      <label>IFSC</label>
+      <input type="text" id="ifsc" required>
+
+      <label>Account Number</label>
+      <input type="text" id="accNo" required>
+
+      <label>Balance</label>
+      <input type="number" id="balance" required>
+
+      <label>Aadhar</label>
+      <input type="text" id="aadhar" required>
+
+      <label>PAN</label>
+      <input type="text" id="pan" required>
+
+      <label>Date of Birth</label>
+      <input type="date" id="dob" required>
+
+      <label>Gender</label>
+      <select id="gender" required>
+        <option value="">Select</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+
+      <label>Marital Status</label>
+      <select id="marital" required>
+        <option value="">Select</option>
+        <option>Single</option>
+        <option>Married</option>
+      </select>
+
+      <label>Email</label>
+      <input type="email" id="email" required>
+
+      <label>Address</label>
+      <textarea id="address" rows="3" required></textarea>
+
+      <label>Contact Number</label>
+      <input type="text" id="contact" required>
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <div id="customerListSection" class="hidden">
+    <h2>Customer List</h2>
+    <div id="customerList"></div>
+  </div>
+
+  <script>
+    let customers = [];
+    let editingIndex = -1;
+
+    function showSection(section) {
+      document.getElementById("registrationForm").style.display = "none";
+      document.getElementById("customerListSection").style.display = "none";
+
+      if (section === 'form') {
+        clearForm();
+        document.getElementById("registrationForm").style.display = "block";
+      } else if (section === 'list') {
+        renderCustomerList();
+        document.getElementById("customerListSection").style.display = "block";
+      }
+    }
+
+    function submitCustomer() {
+      const customer = {
+        ssn: document.getElementById("ssn").value,
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        ifsc: document.getElementById("ifsc").value,
+        accNo: document.getElementById("accNo").value,
+        balance: document.getElementById("balance").value,
+        aadhar: document.getElementById("aadhar").value,
+        pan: document.getElementById("pan").value,
+        dob: document.getElementById("dob").value,
+        gender: document.getElementById("gender").value,
+        marital: document.getElementById("marital").value,
+        email: document.getElementById("email").value,
+        address: document.getElementById("address").value,
+        contact: document.getElementById("contact").value,
+      };
+
+      if (editingIndex >= 0) {
+        customers[editingIndex] = customer;
+        editingIndex = -1;
+      } else {
+        customers.push(customer);
+      }
+
+      clearForm();
+      showSection('list');
+    }
+
+    function renderCustomerList() {
+      const list = document.getElementById("customerList");
+      list.innerHTML = "";
+
+      customers.forEach((cust, index) => {
+        const div = document.createElement("div");
+        div.className = "customer-item";
+        div.innerHTML = `
+          <strong>${cust.firstName} ${cust.lastName}</strong><br>
+          SSN: ${cust.ssn} | Acc No: ${cust.accNo} | IFSC: ${cust.ifsc}<br>
+          Email: ${cust.email} | Contact: ${cust.contact}
+          <div class="action-buttons">
+            <button onclick="editCustomer(${index})">Edit</button>
+            <button class="delete-btn" onclick="removeCustomer(${index})">Remove</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function editCustomer(index) {
+      const cust = customers[index];
+      editingIndex = index;
+      showSection('form');
+
+      document.getElementById("ssn").value = cust.ssn;
+      document.getElementById("ssn").readOnly = true;
+
+      document.getElementById("accNo").value = cust.accNo;
+      document.getElementById("accNo").readOnly = true;
+
+      document.getElementById("firstName").value = cust.firstName;
+      document.getElementById("lastName").value = cust.lastName;
+      document.getElementById("ifsc").value = cust.ifsc;
+      document.getElementById("balance").value = cust.balance;
+      document.getElementById("aadhar").value = cust.aadhar;
+      document.getElementById("pan").value = cust.pan;
+      document.getElementById("dob").value = cust.dob;
+      document.getElementById("gender").value = cust.gender;
+      document.getElementById("marital").value = cust.marital;
+      document.getElementById("email").value = cust.email;
+      document.getElementById("address").value = cust.address;
+      document.getElementById("contact").value = cust.contact;
+    }
+
+    function removeCustomer(index) {
+      if (confirm("Are you sure you want to remove this customer?")) {
+        customers.splice(index, 1);
+        renderCustomerList();
+      }
+    }
+
+    function clearForm() {
+      const ids = ["ssn", "firstName", "lastName", "ifsc", "accNo", "balance", "aadhar", "pan", "dob", "gender", "marital", "email", "address", "contact"];
+      ids.forEach(id => {
+        document.getElementById(id).value = "";
+      });
+
+      document.getElementById("ssn").readOnly = false;
+      document.getElementById("accNo").readOnly = false;
+    }
+
+    // Initial section
+    showSection('list');
+  </script>
+
+</body>
+</html>

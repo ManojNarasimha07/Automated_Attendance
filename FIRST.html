@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bank Employee Portal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .toggle-btn {
+      margin-top: 10px;
+      text-align: center;
+      cursor: pointer;
+      color: #007bff;
+    }
+
+    .toggle-btn:hover {
+      text-decoration: underline;
+    }
+
+    .emp-id {
+      margin-top: 10px;
+      color: green;
+      text-align: center;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="registrationForm">
+    <h2>Register</h2>
+    <div class="form-group">
+      <label>First Name</label>
+      <input type="text" id="firstName" maxlength="50">
+    </div>
+    <div class="form-group">
+      <label>Last Name</label>
+      <input type="text" id="lastName" maxlength="50">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="password" maxlength="30">
+    </div>
+    <div class="form-group">
+      <label>Confirm Password</label>
+      <input type="password" id="confirmPassword" maxlength="30">
+    </div>
+    <div class="form-group">
+      <label>Contact No</label>
+      <input type="text" id="contact" maxlength="10">
+    </div>
+    <button onclick="register()">Submit</button>
+    <div class="emp-id" id="empIdDisplay"></div>
+    <div class="toggle-btn" onclick="toggleForms()">Already Registered? Login</div>
+  </div>
+
+  <div class="container hidden" id="loginForm">
+    <h2>Login</h2>
+    <div class="form-group">
+      <label>Employee ID</label>
+      <input type="text" id="loginEmpId">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="loginPassword">
+    </div>
+    <button onclick="login()">Login</button>
+    <div class="toggle-btn" onclick="toggleForms()">New here? Register</div>
+  </div>
+
+  <script>
+    let registeredUsers = JSON.parse(localStorage.getItem("users") || "{}");
+
+    function generateEmpId() {
+      return Math.floor(1000000 + Math.random() * 9000000).toString();
+    }
+
+    function register() {
+      const fname = document.getElementById("firstName").value.trim();
+      const lname = document.getElementById("lastName").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+      const contact = document.getElementById("contact").value.trim();
+
+      if (!fname || !lname || !password || !confirmPassword || !contact) {
+        alert("All fields are required.");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+
+      if (contact.length !== 10 || isNaN(contact)) {
+        alert("Contact number must be 10 digits.");
+        return;
+      }
+
+      const empId = generateEmpId();
+      registeredUsers[empId] = password;
+      localStorage.setItem("users", JSON.stringify(registeredUsers));
+      document.getElementById("empIdDisplay").innerText = `Your Employee ID is: ${empId}@bank.com`;
+
+      document.getElementById("firstName").value = "";
+      document.getElementById("lastName").value = "";
+      document.getElementById("password").value = "";
+      document.getElementById("confirmPassword").value = "";
+      document.getElementById("contact").value = "";
+    }
+
+    function login() {
+      const empIdInput = document.getElementById("loginEmpId").value.trim();
+      const passwordInput = document.getElementById("loginPassword").value;
+      const empId = empIdInput.replace("@bank.com", "");
+
+      if (registeredUsers[empId] && registeredUsers[empId] === passwordInput) {
+        window.location.href = "home.html"; // Replace with your actual home page
+      } else {
+        alert("Invalid Employee ID or Password");
+      }
+    }
+
+    function toggleForms() {
+      document.getElementById("registrationForm").classList.toggle("hidden");
+      document.getElementById("loginForm").classList.toggle("hidden");
+      document.getElementById("empIdDisplay").innerText = "";
+    }
+  </script>
+
+</body>
+</html>
